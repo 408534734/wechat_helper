@@ -1,3 +1,7 @@
+# Ignore local configure files
+
+src/pub/Configure.java
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
