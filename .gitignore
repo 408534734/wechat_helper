@@ -2,6 +2,16 @@
 
 src/pub/Configure.java
 
+# Ignore eclipse project file
+.settings/
+build/
+WebContent/META-INF/
+WebContent/WEB-INF/
+.classpath
+.project
+*.jar
+
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
