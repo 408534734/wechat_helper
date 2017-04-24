@@ -13,6 +13,7 @@ public class Mother_reply {
 			database = new Database(message.mother);
 		}catch (Exception e) {
 			reply_sorry("数据库连接出错");
+			new Record_error("数据库连接出错");
 			return;
 		}
 		
@@ -31,7 +32,12 @@ public class Mother_reply {
 			reply = "我在数据库中没有查询到相关信息，我已经将这条消息记录在了微信后台，管理员会尽快回复你的哟~";
 		}
 		
-		database.break_connect();
+		try {
+			database.break_connect();
+		}catch (Exception e) {
+			reply += "数据库断开连接失败！";
+			new Record_error("数据库断开连接失败");
+		}
 	}
 	
 	private boolean if_register(String mother, String user) {
