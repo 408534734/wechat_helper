@@ -1,6 +1,7 @@
 # Ignore local configure files
 
 src/pub/Configure.java
+src/pub/Reference.java
 
 # Ignore eclipse project file
 .settings/
