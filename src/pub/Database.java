@@ -12,10 +12,11 @@ public class Database {
 	ResultSet mysql_receiver; //用于接收发送回来的数据包
 	
 	public Database(String database_name) throws Exception{
+		Configure configure = new Configure();
 		Class.forName("com.mysql.jdbc.Driver");
 	    mysql_connection=DriverManager.getConnection(
-	    		"jdbc:mysql://" + new Configure().get_ip_address() + "/" + database_name + "?useUnicode=true&characterEncoding=utf-8",
-	    		new Configure().get_database_username(),new Configure().get_database_password());//建立连接
+	    		"jdbc:mysql://" + configure.get_ip_address() + "/" + database_name + "?useUnicode=true&characterEncoding=utf-8",
+	    		configure.get_database_username(),configure.get_database_password());//建立连接
 		mysql_sender=mysql_connection.createStatement();//定向数据包
 		//mysql_receiver=mysql_sender.executeQuery("");//发送命令，并接收返回结果
 	}
