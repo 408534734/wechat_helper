@@ -21,7 +21,7 @@ public class Send_mail {
             msg.setFrom(new InternetAddress(configure.get_system_mail_username()));  
             msg.addRecipients(Message.RecipientType.TO, InternetAddress.parse(mail_address));   
             msg.setSubject(tittle);
-            msg.setContent("<h1>" + contents + "</h1>","text/html;charset=UTF-8");
+            msg.setContent("<h3>" + contents + "</h3>","text/html;charset=UTF-8");
 
             msg.saveChanges();  
 

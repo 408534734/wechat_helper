@@ -76,23 +76,29 @@ public class Mother_reply {
 				database_loop.select(database.mysql_receiver.getString(1), "mail", message.content);
 				if (database_loop.mysql_receiver.next()) {
 					database_loop.update("user", "default_sheet", database.mysql_receiver.getString(1), "openid", message.user);
-					String identify_code = new Make_random_string().get();
+					String identify_code;
+					do {
+						identify_code = new Make_random_string().get();
+						database_loop.select("identify_code", "identify_code", identify_code);
+					}while (database_loop.mysql_receiver.next());
 					String[] keys = {"identify_code", "openid", "mail"};
 					String[] values = {identify_code, message.user, message.content};
 					database_loop.insert("identify_code", keys, values);
 					String identify_url = "http://sysustudentunion.cn/wechat_helper/identify.jsp?identify_code=" + identify_code;
 					new Send_mail(message.content, "这是一封【激活】邮件",
-							"这是一封微信公众号通讯录功能【激活】邮件，如果不是您本人进行的操作，请忽略这封邮件。\n" + 
+							"    这是一封微信公众号通讯录功能【激活】邮件，如果不是您本人进行的操作，请忽略这封邮件。\n" + 
 					"如果是您本人的操作，请点击下方的链接进行激活\n" + identify_url);
 					reply = "我们已经往该邮箱中发送了一封激活邮件，请点击邮件中的链接完成注册。";
-					break;
+					database_loop.break_connect();
+					return true;
 				}
 			}
 			database_loop.break_connect();
+			return false;
 		}catch(Exception e) {
 			this.reply_sorry("register_by_mail_error");
+			return true;
 		}
-		return true;//TODO
 	}
 	
 	private boolean register_by_add() {
