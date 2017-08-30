@@ -5,8 +5,13 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 public class Send_mail {
+	//邮件发送模块
+	public Send_mail(){
+		//构造函数为空
+	}
 
-	public Send_mail(String mail_address, String tittle, String contents) {
+	public boolean send(String mail_address, String tittle, String contents) {
+		//发送邮件功能，当邮件发送失败的时候返回false
 		try {  
             Properties props = new Properties();
             Configure configure = new Configure();
@@ -33,12 +38,15 @@ public class Send_mail {
         } catch (Exception e) {  
             new Record_error("邮件发送失败！邮件发送地址为：" + mail_address);
             System.out.println("邮件发送失败！邮件发送地址为：" + mail_address);
+            return false;
         }
+		return true;
 	}
 
 	public static void main(String[] args) {
 		long start_time = System.currentTimeMillis();
-		new Send_mail("914989053@qq.com", "这是一封测试邮件", "以后有事情我们就邮件联系吧 :)");
+		if (new Send_mail().send("408534734", "这是一封测试邮件", "以后有事情我们就邮件联系吧 :)")==false)
+			System.out.println("确认返回false！");
 		long end_time = System.currentTimeMillis();
 		System.out.println("finish in " + (end_time - start_time));
 	}

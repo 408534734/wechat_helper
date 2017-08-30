@@ -6,7 +6,12 @@ import org.dom4j.*;
 
 public class XML_worker {
 	
-	public String XML_string, mother, user, createtime, msgtype, content;
+	public String XML_string, 	//XML字符串
+				mother, 		//公众号ID
+				user, 			//发送用户openID
+				createtime, 	//创建时间
+				msgtype, 		//消息类型
+				content;		//消息内容
 	
 	public XML_worker(String in) throws Exception{
 		XML_string = in;
