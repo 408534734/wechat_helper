@@ -10,6 +10,8 @@ public class Result_table {
 	public int num_of_row, num_of_column;
 	public String column[], data[][];
 	
+	public Result_table(){}
+	
 	public Result_table(ResultSet ori) throws Exception{
 		try {
 			ResultSetMetaData column_set = ori.getMetaData();
@@ -46,7 +48,7 @@ public class Result_table {
 			}
 			if (this.data[i][0].equals(user)) {
 				collector.append(new Link().get_edit_person_link(
-						database, mother, sheet_name, user, "点击此处即可修改你的个人信息"));
+						database, mother, sheet_name, user, "点击此处") + "即可修改你的个人信息");
 			}
 			collector.append("\n");
 		}
@@ -57,6 +59,15 @@ public class Result_table {
 			collector.append(this.data[i][0]);
 			collector.append("：");
 			collector.append(this.data[i][2]);
+			collector.append("\n");
+		}
+	}
+	
+	public void bilibili_express(StringBuilder collector) {
+		if (this.num_of_row == 0)
+			collector.append(" ");
+		for (int i = 0; i < this.num_of_row; i++) {
+			collector.append(this.data[i][0]);
 			collector.append("\n");
 		}
 	}

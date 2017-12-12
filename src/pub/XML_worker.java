@@ -21,7 +21,7 @@ public class XML_worker {
 		mother = root.elementText("ToUserName");
 		user = root.elementText("FromUserName");
 		msgtype = root.elementText("MsgType");
-		content = root.elementText("Content");
+		content = "" + root.elementText("Content");
 	}
 	
 	public String trans_parameter_to_string() {	

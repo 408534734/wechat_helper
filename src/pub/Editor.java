@@ -10,14 +10,15 @@ public class Editor {
 	 * 1：超级管理员，可以操控所有
 	 * 2：普通管理员，可以操控其所在的表
 	 * 3：普通成员，只可以修改自己的信息
-	 * 4：未通过验证，默认状态
+	 * 4：添加成员，正在注册的用户
+	 * 5：未通过验证，默认状态
 	 */
 	public String mother, sheet, openid, password;
 	//public String super_manager_link, manager_link, edit_person_link;
 	public boolean verified, database_valid;
 	
 	public Editor() {
-		previlege = 4;
+		previlege = 5;
 		verified = false;
 		database = null;
 		database_valid = false;
@@ -35,11 +36,14 @@ public class Editor {
 		//检查password是否有效，同时删除数据库中的无效链接
 		//password有效时间为30分钟
 		String type = null;
-		if (previlege == 3)
-			type = "_edit_person_link";
+		if (previlege == 1)
+			type = "_super_manager_link";
 		else if (previlege == 2)
 			type = "_manager_link";
-		else type = "_super_manager_link";
+		if (previlege == 3)
+			type = "_edit_person_link";
+		else if (previlege == 4)
+			type = "_add_person_link";
 		try {
 			Result_table result = database.select(type);
 			password = password + sheet + openid;
@@ -47,10 +51,11 @@ public class Editor {
 				Time time_calculator = new Time();
 				if (time_calculator.get_time()
 						- time_calculator.decode_time(result.data[i][0].substring(0, 13))
-						> 3000*60*1000) {
+						> new Valid_time().link()) {
 					database.delete(type, "password", result.data[i][0]);
 					continue;
 				}
+				//System.out.println(password + " ?= \n" + result.data[i][0] + "\n\n");
 				if (result.data[i][0].equals(password)) {
 					pass_verification(previlege, mother, sheet, openid, password);
 					return true;

@@ -33,7 +33,7 @@
 			<%
 		}
 		if (parameter_correct == true) {
-			if (editor.check_password(3, mother, sheet, openid, password) == false) {
+			if (editor.check_password(4, mother, sheet, openid, password) == false) {
 				%>
 				<script type="text/javascript">
 				alert("错误的链接或链接已失效（链接有效时间为30秒）");
@@ -46,6 +46,7 @@
 		//如果已经初始化，则
 		if (editor.previlege <= 2) {
 			//检查是否是由更高权限的修改页面跳转来的，并确定要修改的openid
+			if (request.getParameter("user") != null)
 			editor.openid = new Encrypt().decode(request.getParameter("user"));
 			editor.build_connection();
 			%>
@@ -77,12 +78,12 @@
 					parameter_correct = false;
 					%>
 					<script type="text/javascript">
-					alert("链接参数出错！");
+					alert("链接参数不足！请检查是否使用了完整的链接");
 					</script>
 					<%
 				}
 				if (parameter_correct == true) {
-					if (editor.check_password(3, mother, sheet, openid, password) == false) {
+					if (editor.check_password(4, mother, sheet, openid, password) == false) {
 						%>
 						<script type="text/javascript">
 						alert("错误的链接或链接已失效（链接有效时间为30秒）");
@@ -100,70 +101,81 @@
 	}
 %>
 
-<%//用于检验是否有修改表单提交，如果有则修改数据库数据
-	if (editor.verified && request.getParameter("edit")!=null && request.getParameter("edit").equals("yes")) {
+<%//用于检验是否有添加表单提交，如果有则修改数据库数据
+	if (editor.verified && request.getParameter("added")!=null && request.getParameter("added").equals("yes")) {
 		try {
 			Result_table result = editor.database.select(editor.sheet, "_openid", editor.openid);
-			for (int i = 1; i < result.num_of_column; i++) {
-				//out.println(result.column[i]+":"+request.getParameter(""+i)+"<br></br>");
-				if (result.data[0][i].equals(request.getParameter(""+i)) == false) {
-					editor.database.update(editor.sheet, 
-							result.column[i], request.getParameter(""+i), "_openid", editor.openid);
-				}
+			if (result.num_of_row != 0) {
+				out.print("您已经注册，无法重复注册，可以点击<a href=\"edit_person.jsp\">这里</a>来修改你的信息");
 			}
-			//out.print("修改成功！<br></br>");
-			%>
-			<script type="text/javascript">
-			alert("修改成功！");
-			</script>
-			<%
+			else {
+				String[] keys = new String[result.num_of_column];
+				String[] values = new String[result.num_of_column];
+				int p = 0;
+				keys[p] = "_openid";
+				values[p] = editor.openid;
+				p++;
+				for (int i = 1; i < result.num_of_column-2; i++) {
+					keys[p] = result.column[i];
+					if (!result.column[i].startsWith("_"))
+						values[p] = request.getParameter(""+i);
+					else values[p] = "";
+					p++;
+				}
+				keys[p] = "_manager";
+				values[p] = "否";
+				p++;
+				keys[p] = "_order";
+				values[p] = "500";
+				p++;
+				editor.database.insert(editor.sheet, keys, values);
+				out.print("新建成功，你的信息如下<br>");
+				for (int i = 1; i < p-2; i++) {
+					if (keys[i].startsWith("_"))
+						continue;
+					out.print(keys[i] + " : " + values[i] + "<br>");
+				}
+				out.print("点击<a href=\"edit_person.jsp\">这里</a>继续修改你的信息");
+			}
 		} catch (Exception e) {
 			//out.print("修改出错！请重试<br></br>");
 			%>
 			<script type="text/javascript">
-			alert("修改出错！请重试！");
+			alert("添加出错！请返回重试！");
 			</script>
 			<%
 		}
+		editor.break_connection();
 	}
-%>
 
-<%//用于生成网页
-	if (editor.verified) {
+	//用于生成网页
+	else if (editor.verified) {
 		try {
 			Result_table result = editor.database.select(editor.sheet, "_openid", editor.openid);
-			%><form action="<%="edit_person.jsp" %>" method="post">
-			<input type="hidden" name="edit" value="yes">
-			<input type="hidden" name="user" value="<%=new Encrypt().encode(editor.openid) %>"><%
-			for (int i = 1; i < result.num_of_column; i++) {
-				if (result.column[i].equals("_order")) {
-					if (editor.previlege <= 2) { %>
-						顺序:
-						<input type="text" name="<%=""+i%>" value="<%=result.data[0][i]%>" maxlength="40" size="40"><br>
-						（这里顺序使用的是ascii码顺序，可以直接用较小的数字表示高优先级）<br>
-					<%}
-					else {%>
-					<input type="hidden" name="<%=""+i%>" value="<%=result.data[0][i]%>">
+			if (result.num_of_row != 0) {
+				out.print("您已经注册，可以点击<a href=\"edit_person.jsp\">这里</a>来修改你的信息");
+			}
+			else {
+				%><form action="<%="add_person.jsp" %>" method="post">
+				<input type="hidden" name="user" value="<%=new Encrypt().encode(editor.openid) %>">
+				<input type="hidden" name="added" value="yes"> <%
+				for (int i = 1; i < result.num_of_column; i++) {
+					if (!result.column[i].startsWith("_")) { %>
+						<%=result.column[i]+":"%>
+						<input type="text" name="<%=""+i%>" maxlength="40" size="40"><br></br>
 					<%}
 				}
-				else if (result.column[i].startsWith("_")) {%>
-					<input type="hidden" name="<%=""+i%>" value="<%=result.data[0][i]%>">
-				<%}
-				else {%>
-					<%=result.column[i]+":"%>
-					<input type="text" name="<%=""+i%>" value="<%=result.data[0][i]%>" maxlength="40" size="40"><br></br>
-				<%}
+				%>
+				<input type="submit" value="确认">
+				</form>
+				<%
+				editor.break_connection();
 			}
-			%>
-			<input type="submit" value="确认">
-			</form>
-			<%
-			editor.break_connection();
 		}
 		catch (Exception e) {
 			%>
 			<script type="text/javascript">
-			alert("生成编辑页面出错！");
+			alert("生成添加页面出错！");
 			</script>
 			<%
 		}

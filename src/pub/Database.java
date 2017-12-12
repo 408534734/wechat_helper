@@ -21,7 +21,7 @@ public class Database {
 		    		"jdbc:mysql://" + configure.get_ip_address() + "/" + database_name + "?useUnicode=true&characterEncoding=utf-8",
 		    		configure.get_database_username(),configure.get_database_password());//建立连接
 			mysql_sender=mysql_connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_READ_ONLY);//定向数据包,此处的参数让返回表中的指针可以移动
-			//mysql_receiver=mysql_sender.executeQuery("");//发送命令，并接收返回结果
+			
 		} catch (Exception e) {
 			new Record_error("数据库连接出错，要连接到的数据库是：" + database_name);
 			throw new Exception();
@@ -45,6 +45,17 @@ public class Database {
 			return new Result_table(this.mysql_receiver);
 		} catch (Exception e) {
 			new Record_error("sql语句出错：" + "SELECT * FROM " + sheet_name);
+			throw new Exception();
+		}
+	}
+	
+	public Result_table select_in_order(String sheet_name, String order) throws Exception {
+		//用于提取整个表
+		try {
+			this.mysql_receiver = this.mysql_sender.executeQuery("SELECT * FROM " + sheet_name + " order by " + order);
+			return new Result_table(this.mysql_receiver);
+		} catch (Exception e) {
+			new Record_error("sql语句出错：" + "SELECT * FROM " + sheet_name + " order by " + order);
 			throw new Exception();
 		}
 	}
@@ -80,7 +91,7 @@ public class Database {
 	}
 	
 	public Result_table select_like(String sheet_name, String key, String value) throws Exception {
-		//用于提取某一个表中某个信息等于某个值的内容
+		//用于提取某一个表中某个信息包含某个值的内容
 		try {
 			value = this.add_quotes("%" + value + "%");
 			//System.out.println("SELECT * FROM " + sheet_name + " WHERE " + key + "=" + value);
@@ -165,6 +176,7 @@ public class Database {
 	public void execute(String command) throws Exception {
 		try {
 			this.mysql_sender.execute(command);
+			//System.out.println(command);
 		} catch (Exception e) {
 			new Record_error("sql语句出错：" + command);
 			throw new Exception();
@@ -188,7 +200,7 @@ public class Database {
 	
 	public static void main(String[] args) {
 		//test
-		try {
+		/*try {
 			Database database = new Database("gh_9f7d8b8c9473");
 			Result_table result = database.select_like("姓名,手机", "第二届学生会通讯录", "部门", "秘书处");
 			StringBuilder tmp = new StringBuilder();
@@ -197,16 +209,16 @@ public class Database {
 			System.out.println("correct!");
 		}catch (Exception e) {
 			System.out.println("error!");
-		}
+		}*/
 		
 		//加上OPENID
 		/*try {
 			Database database = new Database("gh_9f7d8b8c9473");
 			Result_table result = database.select("第二届学生会通讯录");
 			for (int i = 0; i < result.num_of_row; i++) {
-				Result_table result_detail = database.select("user", "mail", result.data[i][3]);
+				Result_table result_detail = database.select("user", "tel", result.data[i][2]);
 				if (result_detail.num_of_row != 0) {
-					database.update("第二届学生会通讯录", "_openid", result_detail.data[0][0], "mail", result.data[i][3]);
+					database.update("第二届学生会通讯录", "_openid", result_detail.data[0][0], "tel", result.data[i][2]);
 					System.out.println("finish " + i);
 				}
 			}
@@ -238,6 +250,48 @@ public class Database {
 						System.out.println(result.data[i][1]);
 					}
 				}
+			}
+			System.out.println("Success!");
+		} catch (Exception e) {
+			System.out.println("Error!");
+		}*/
+		//添加随机OPENID
+		/*try {
+			Database database = new Database("gh_9f7d8b8c9473");
+			Result_table result = database.select("第二届学生会通讯录");
+			for (int i = 0; i < result.num_of_row; i++) {
+				if (result.data[i][0] == null || result.data[i][0].isEmpty()) {
+					database.update("第二届学生会通讯录", "_openid", new Make_random_string().get(), "tel", result.data[i][2]);
+				}
+			}
+			System.out.println("Success!");
+		} catch (Exception e) {
+			System.out.println("Error!");
+		}*/
+		//合并重复
+		/*try {
+			Database database = new Database("gh_9f7d8b8c9473");
+			Result_table result = database.select("第二届学生会通讯录");
+			for (int i = 0; i < result.num_of_row; i++) {
+				for (int j = i+1; j < result.num_of_row; j++) {
+					if (result.data[i][0].equals(result.data[j][0])) {
+						System.out.println("find one!");
+						database.execute("UPDATE 第二届学生会通讯录 set 部门 = '" + result.data[i][4]+"、"+result.data[j][4] + 
+								"' WHERE _openid = " + database.add_quotes(result.data[i][0]) + " and 部门 = " + database.add_quotes(result.data[i][4]));
+						database.execute("DELETE FROM 第二届学生会通讯录 WHERE _openid = " + database.add_quotes(result.data[j][0]) + " and 部门=" + database.add_quotes(result.data[j][4]));
+						break;
+					}
+				}
+			}
+			System.out.println("Success!");
+		} catch (Exception e) {
+			System.out.println("Error!");
+		}*/
+		/*try {
+			Database database = new Database("gh_9f7d8b8c9473");
+			Result_table result = database.select("第二届学生会通讯录");
+			for (int i = 0; i < result.num_of_row; i++) {
+				database.update("第二届学生会通讯录", "_manager", "否", "_openid", result.data[i][0]);
 			}
 			System.out.println("Success!");
 		} catch (Exception e) {
