@@ -18,12 +18,13 @@ public class Database {
 			Configure configure = new Configure();
 			Class.forName("com.mysql.jdbc.Driver");
 		    mysql_connection=DriverManager.getConnection(
-		    		"jdbc:mysql://" + configure.get_ip_address() + "/" + database_name + "?useUnicode=true&characterEncoding=utf-8",
+		    		"jdbc:mysql://" + configure.get_ip_address() + "/" + database_name + "?useSSL=false&useUnicode=true&characterEncoding=utf-8",
 		    		configure.get_database_username(),configure.get_database_password());//建立连接
 			mysql_sender=mysql_connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_READ_ONLY);//定向数据包,此处的参数让返回表中的指针可以移动
 			
 		} catch (Exception e) {
 			new Record_error("数据库连接出错，要连接到的数据库是：" + database_name);
+			//System.out.println("Error."+e);
 			throw new Exception();
 		}
 	}

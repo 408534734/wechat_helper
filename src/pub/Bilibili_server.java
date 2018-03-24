@@ -66,13 +66,29 @@ public class Bilibili_server {
 			        	database = new Database(username);
 			        } catch (Exception e) {
 			        	back.append("用户名错误！");
+			        	writer.println(back.toString());
+			        	writer.flush();
+			        	writer.close();
+			        	in.close();
+			        	socket.close();
 			        	System.out.println("用户名错误！");
 			        	continue;
 			        }
 			        
 			        /*获取弹幕数据，并清空数据库*/
-			        database.select("_bilibili").bilibili_express(back);
-			        database.execute("delete from _bilibili");
+			        try {
+				        database.select("_bilibili").bilibili_express(back);
+				        database.execute("delete from _bilibili");
+			        } catch (Exception e) {
+			        	back.append("弹幕开关未开启！");
+			        	writer.println(back.toString());
+			        	writer.flush();
+			        	writer.close();
+			        	in.close();
+			        	socket.close();
+			        	System.out.println("弹幕开关未开启！");
+			        	continue;
+			        }
 			        
 			        /*发送数据*/
 		            writer.println(back.toString());

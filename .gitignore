@@ -1,16 +1,10 @@
 # Ignore local configure files
 
 src/pub/Configure.java
-src/pub/Reference.java
+runable_program/
 
 # Ignore eclipse project file
-.settings/
 build/
-WebContent/META-INF/
-WebContent/WEB-INF/
-.classpath
-.project
-*.jar
 
 
 # Windows image file caches
